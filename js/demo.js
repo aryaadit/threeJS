@@ -72,6 +72,7 @@ function init() {
   //Floor attributes
   meshFloor.rotation.x -= Math.PI / 2;
   meshFloor.receiveShadow = true;
+  //Crate attributes
   crate.position.set(2.5, 1.5, 2.5);
   crate.receiveShadow = true;
   crate.castsShadow = true;
