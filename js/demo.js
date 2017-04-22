@@ -7,7 +7,19 @@ var player = {height: 1.8, speed: 0.2, turnSpeed: Math.PI * 0.01};
 var horizontal = true;
 var vertical = true;
 var depth = true;
-var useWireframe = true;
+var useWireframe = false;
+
+var loadingScreen = {
+  scene: new THREE.Scene(),
+  camera: new THREE.PerspectiveCamera(90, 1280/720, 0.1, 100),
+  box: new THREE.Mesh(
+    new THREE.BoxGeometry(0.5, 0.5, 0.5),
+    new THREE.MeshBasicMaterial({color:0x4444ff})
+  )
+};
+
+var resourcesLoaded = false
+var loadingManager = null
 
 
 function init() {
@@ -16,17 +28,24 @@ function init() {
   scene = new THREE.Scene();
   camera = new THREE.PerspectiveCamera(90, 1280/720, 0.1, 1000);
 
+  loadingScreen.box.position.set(0, 0, 5);
+  loadingScreen.camera.lookAt(loadingScreen.box.position);
+  loadingScreen.scene.add(loadingScreen.box);
+
+  loadingManager = new THREE.LoadingManager();
+  loadingManager.onProgress
+
   //Texture and material loading
-  var textureLoader = new THREE.TextureLoader();
+  var textureLoader = new THREE.TextureLoader(loadingManager);
   crateTextureDiffuse = textureLoader.load('texture/crate1_diffuse.png');
   crateTextureNormal = textureLoader.load('texture/crate1_normal.png');
   crateTextureBump = textureLoader.load('texture/crate1_bump.png');
 
   //Material and object loading
-  var mtlLoader1 = new THREE.MTLLoader();
+  var mtlLoader1 = new THREE.MTLLoader(loadingManager);
   mtlLoader1.load('model/Tent_01.mtl', function(materials) {
     materials.preload();
-    var objLoader = new THREE.OBJLoader();
+    var objLoader = new THREE.OBJLoader(loadingManager);
     objLoader.setMaterials(materials);
     objLoader.load('model/Tent_01.obj', function(mesh) {
       mesh.traverse(function(node) {
@@ -37,7 +56,7 @@ function init() {
       });
       scene.add(mesh);
       mesh.position.set(-3, 0, 4);
-      mesh.rotation.set(Math.PI / 2);
+      // mesh.rotation.set(Math.PI / 2);
     });
   });
 
@@ -131,6 +150,13 @@ function init() {
 }
 
 function animate() {
+
+  if(!resourcesLoaded) {
+    requestAnimationFrame(animate);
+    loadingScreen.box.rotation.z += Math.PI * 0.01;
+    renderer.render(loadingScreen.scene, loadingScreen.camera);
+    return;
+  }
   requestAnimationFrame(animate);
 
   //Changing the xyz attributes
