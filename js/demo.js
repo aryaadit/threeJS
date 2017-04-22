@@ -1,4 +1,5 @@
 var scene, camera, renderer, mesh;
+var crate, crateTexture, crateNormalMap, crateBumpMap;
 var meshFloor;
 
 var keyboard = {};
@@ -15,14 +16,15 @@ function init() {
   camera = new THREE.PerspectiveCamera(90, 1280/720, 0.1, 1000);
 
   //Texture and material loading
-  texture = THREE.ImageUtils.loadTexture('texture/crate.jpg');
-  material = new THREE.MeshBasicMaterial({map: texture});
+  var textureLoader = new THREE.TextureLoader();
+  crateTextureDiffuse = textureLoader.load('texture/crate1_diffuse.png');
+  crateTextureNormal = textureLoader.load('texture/crate1_normal.png');
+  crateTextureBump = textureLoader.load('texture/crate1_bump.png');
 
   //Creating the mesh objects for the scene
   meshCube1 = new THREE.Mesh(
-    new THREE.BoxGeometry(1, 1, 1, 10, 10, 10),
+    new THREE.BoxGeometry(1, 1, 1, 10, 10, 10)
     // new THREE.MeshPhongMaterial({color:0xff9999, wireframe:false}),
-    material
   );
 
   meshCube2 = new THREE.Mesh(
@@ -33,6 +35,16 @@ function init() {
   meshFloor = new THREE.Mesh(
      new THREE.PlaneGeometry(20, 20, 10, 10),
      new THREE.MeshPhongMaterial({color:0xffffff, wireframe:false})
+  );
+
+  crate = new THREE.Mesh(
+    new THREE.BoxGeometry(3,3,3),
+    new THREE.MeshPhongMaterial({
+      color:0xffffff,
+      map:crateTextureDiffuse,
+      normalMap:crateTextureNormal,
+      bumpMap:crateTextureBump
+    })
   );
 
   //Setting up ambient and point lights for lighting in scene
@@ -60,13 +72,17 @@ function init() {
   //Floor attributes
   meshFloor.rotation.x -= Math.PI / 2;
   meshFloor.receiveShadow = true;
+  crate.position.set(2.5, 1.5, 2.5);
+  crate.receiveShadow = true;
+  crate.castsShadow = true;
 
   //Add objects to scene
-  scene.add(meshCube1);
-  scene.add(meshCube2);
+  //scene.add(meshCube1);
+  //scene.add(meshCube2);
   scene.add(meshFloor);
   scene.add(ambientLight);
   scene.add(light);
+  scene.add(crate)
 
   //Creating the renderer to visualize the scene
   renderer = new THREE.WebGLRenderer();
