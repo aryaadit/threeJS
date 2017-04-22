@@ -7,6 +7,7 @@ var player = {height: 1.8, speed: 0.2, turnSpeed: Math.PI * 0.01};
 var horizontal = true;
 var vertical = true;
 var depth = true;
+var useWireframe = true;
 
 
 function init() {
@@ -21,6 +22,36 @@ function init() {
   crateTextureNormal = textureLoader.load('texture/crate1_normal.png');
   crateTextureBump = textureLoader.load('texture/crate1_bump.png');
 
+  //Material and object loading
+  var mtlLoader1 = new THREE.MTLLoader();
+  mtlLoader1.load('model/Tent_01.mtl', function(materials) {
+    materials.preload();
+    var objLoader = new THREE.OBJLoader();
+    objLoader.setMaterials(materials);
+    objLoader.load('model/Tent_01.obj', function(mesh) {
+      mesh.traverse(function(node) {
+        if(node instanceof THREE.Mesh) {
+          node.castShadow = true;
+          node.receiveShadow = true;
+        }
+      });
+      scene.add(mesh);
+      mesh.position.set(-3, 0, 4);
+      mesh.rotation.set(Math.PI / 2);
+    });
+  });
+
+  var mtlLoader2 = new THREE.MTLLoader();
+  mtlLoader2.load('model/Campfire_01.mtl', function(materials) {
+    materials.preload();
+    var objLoader = new THREE.OBJLoader();
+    objLoader.setMaterials(materials);
+    objLoader.load('model/Campfire_01.obj', function(mesh) {
+      //scene.add(mesh);
+      mesh.position.set(-3, 2, 4);
+    });
+  });
+
   //Creating the mesh objects for the scene
   meshCube1 = new THREE.Mesh(
     new THREE.BoxGeometry(1, 1, 1, 10, 10, 10)
@@ -29,12 +60,12 @@ function init() {
 
   meshCube2 = new THREE.Mesh(
     new THREE.BoxGeometry(1, 1, 1, 10, 10, 10),
-    new THREE.MeshPhongMaterial({color:0xffff66, wireframe:false})
+    new THREE.MeshPhongMaterial({color:0xffff66, wireframe:useWireframe})
   );
 
   meshFloor = new THREE.Mesh(
      new THREE.PlaneGeometry(20, 20, 10, 10),
-     new THREE.MeshPhongMaterial({color:0xffffff, wireframe:false})
+     new THREE.MeshPhongMaterial({color:0xffffff, wireframe:useWireframe})
   );
 
   crate = new THREE.Mesh(
@@ -46,6 +77,8 @@ function init() {
       bumpMap:crateTextureBump
     })
   );
+
+
 
   //Setting up ambient and point lights for lighting in scene
   ambientLight = new THREE.AmbientLight(0xffffff, 0.2);
