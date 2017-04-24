@@ -3,11 +3,12 @@ var crate, crateTexture, crateNormalMap, crateBumpMap;
 var meshFloor;
 
 var keyboard = {};
-var player = {height: 1.8, speed: 0.2, turnSpeed: Math.PI * 0.01};
+var player = {height: 1.8, speed: 0.2, turnSpeed: Math.PI * 0.005};
 var horizontal = true;
 var vertical = true;
 var depth = true;
 var useWireframe = false;
+var screenPos = 600;
 
 var loadingScreen = {
   scene: new THREE.Scene(),
@@ -33,7 +34,14 @@ function init() {
   loadingScreen.scene.add(loadingScreen.box);
 
   loadingManager = new THREE.LoadingManager();
-  loadingManager.onProgress
+  loadingManager.onProgress = function(item, loaded, total) {
+    console.log(item, loaded, total)
+  };
+
+  loadingManager.onLoad = function() {
+    console.log("loaded all assetts");
+    resourcesLoaded = true;
+  };
 
   //Texture and material loading
   var textureLoader = new THREE.TextureLoader(loadingManager);
@@ -207,10 +215,10 @@ function animate() {
   renderer.render(scene, camera);
 
   //Keyboard commands
-  if(keyboard[37]) { //left key
+  if(keyboard[37] || screenPos < 300) { //left key
     camera.rotation.y -= Math.PI * player.turnSpeed;
   }
-  if(keyboard[39]) { //right key
+  if(keyboard[39] || screenPos >= 900) { //right key
     camera.rotation.y += Math.PI * player.turnSpeed;
   }
   // if(keyboard[38]) { //up key
@@ -245,7 +253,12 @@ function keyUp(event) {
   keyboard[event.keyCode] = false;
 }
 
-window.addEventListener('keydown',keyDown);
+function mouseMove(event) {
+  screenPos = event.x;
+}
+
+window.addEventListener('keydown', keyDown);
 window.addEventListener('keyup', keyUp);
+window.addEventListener('mousemove', mouseMove);
 
 window.onload = init;
