@@ -3,13 +3,14 @@ var crate, crateTexture, crateNormalMap, crateBumpMap;
 var meshFloor;
 
 var keyboard = {};
-var player = {height: 1.8, speed: 0.2, turnSpeed: Math.PI * 0.005};
+var player = {height: 1.8, speed: 0.1, turnSpeed: Math.PI * 0.0025};
 var horizontal = true;
 var vertical = true;
 var depth = true;
 var useWireframe = false;
 var screenPos = 600;
 
+// Loading screen
 var loadingScreen = {
   scene: new THREE.Scene(),
   camera: new THREE.PerspectiveCamera(90, 1280/720, 0.1, 100),
@@ -172,6 +173,7 @@ function animate() {
   meshCube1.rotation.y += 0.02;
   meshCube2.rotation.x += 0.01;
   meshCube2.rotation.y += 0.02;
+  crate.rotation.y += 0.02;
   if(meshCube1.position.x >= 10) {
     horizontal = true;
   }
@@ -246,10 +248,12 @@ function animate() {
 }
 
 function keyDown(event) {
+  event.preventDefault;
   keyboard[event.keyCode] = true;
 }
 
 function keyUp(event) {
+  event.preventDefault;
   keyboard[event.keyCode] = false;
 }
 
